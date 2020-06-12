@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+var start_time = Date.now()
+
 function App() {
   const [currentTime, setCurrentTime] = useState(0);
-  var start_time = Date.now();
 
   useEffect(() => {
     fetch('/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time-start_time);
+      setCurrentTime(data.time - start_time);
     });
   })
 
