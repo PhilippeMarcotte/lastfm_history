@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import Radio from '@material-ui/core/Radio';
+import Paper from '@material-ui/core/Paper';
+import Album from "./Album.js";
+import Slider from '@material-ui/core/Slider';
+import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -13,56 +22,67 @@ const useStyles = makeStyles((theme) => ({
   control: {
     padding: theme.spacing(2),
   },
+  Slider:  {
+    width: 300,
+  }
 }));
 
-var start_time = Date.now()
-
 function App() {
-  const [currentTime, setCurrentTime] = useState(0);
+  const [spacing, setSpacing] = React.useState(2);
+  const [n_albums, setNbrAlbums] = React.useState(5);
+  const classes = useStyles();
 
-  useEffect(() => {
-    fetch('/time').then(res => res.json()).then(data => {
-      setCurrentTime(data.time - start_time);
-    });
-  })
+  const handleChange = (event, value) => {
+    setSpacing(Number(value));
+  };
+
+  const handleNbrAlbums = (event, value) => {
+    setNbrAlbums(Number(value));
+  };
+
+  var albums = [];
+  for (var i = 0; i < n_albums; i++)
+  {
+    albums.push(<Album/>);
+  }
 
   return (
-    <Grid container className={classes.root} spacing={2}>
-      <Grid item xs={12}>
-        <Grid container justify="center" spacing={spacing}>
-          {[0, 1, 2, 3, 4, 5, 6].map(value => (
-            <Grid key={value} item>
-              <Paper className={classes.paper} />
-            </Grid>
-          ))}
+    <div>
+      <Box>
+        <Typography variant="body2" color="textSecondary" component="p">
+          Violett Pi
+        </Typography>
+        <Paper className={classes.control}>
+            <Slider style={{width: 300}}
+              defaultValue={2}
+              onChange={handleChange}
+              aria-labelledby="continuous-slider"
+              min={0}
+              max={10}
+            />
+        </Paper>
+      </Box>
+      <Paper className={classes.control}>
+              <Slider style={{width: 300}}
+                defaultValue={5}
+                onChange={handleNbrAlbums}
+                aria-labelledby="continuous-slider"
+                min={0}
+                max={21}
+              />
+      </Paper>
+      <Grid container className={classes.root} spacing={2}>
+        <Grid item xs={12}>
+          <Grid container align="left" spacing={spacing}>
+            {albums.map((album, i) => (
+              <Grid key={i} item>
+                {album}
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Paper className={classes.control}>
-          <Grid container>
-            <Grid item>
-              <FormLabel>spacing</FormLabel>
-              <RadioGroup
-                name="spacing"
-                aria-label="spacing"
-                value={spacing.toString()}
-                onChange={handleChange}
-                row
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(value => (
-                  <FormControlLabel
-                    key={value}
-                    value={value.toString()}
-                    control={<Radio />}
-                    label={value.toString()}
-                  />
-                ))}
-              </RadioGroup>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Grid>
-    </Grid>
+    </div>
   );
 }
 
