@@ -11,13 +11,14 @@ import Box from "@material-ui/core/Box";
 
 function Album() {
   const imageStyle = {
-    maxWidth: "100%",
+    minWidth: "125px",
+    width:"100%",
     height: "auto"
   };
   const img = process.env.PUBLIC_URL + "/album.jpg";
   return (
     <Box>
-      <img  src={process.env.PUBLIC_URL + "/album.jpg"}/>
+      <img  src={process.env.PUBLIC_URL + "/album.jpg"} style={imageStyle} />
       <Box>
         <Typography gutterBottom variant="h5" component="h2" style={{fontSize: "1vm"}}>
           Violett Pi

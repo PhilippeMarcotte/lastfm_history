@@ -13,7 +13,7 @@ import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1,
+    flexGrow: 0,
   },
   paper: {
     height: 140,
@@ -29,13 +29,8 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const [spacing, setSpacing] = React.useState(2);
-  const [n_albums, setNbrAlbums] = React.useState(2);
+  const [n_albums, setNbrAlbums] = React.useState(50);
   const classes = useStyles();
-  const imageStyle = {
-    maxWidth: "100%",
-    height: "auto",
-    width: "auto"
-  };
 
   const handleChange = (event, value) => {
     setSpacing(Number(value));
@@ -76,22 +71,22 @@ function App() {
             </Typography>
             <Box display="flex" flexDirection="row" alignItems="center">
               <Slider style={{width: 300}}
-                defaultValue={2}
+                defaultValue={50}
                 onChange={handleNbrAlbums}
                 aria-labelledby="continuous-slider"
                 min={0}
-                max={10}
+                max={100}
               />
               <Typography variant="body2" component="label" style={{marginLeft: "10px"}}>
                 {n_albums}
               </Typography>
             </Box>
           </Box>        
-          <Box display="flex" justifyContent="center" style={imageStyle}>
-            <Box style={{width: "64vw"}}>
-              <Grid container className={classes.root} spacing={spacing}>
+          <Box display="flex" style={{justifyContent: "center"}}>
+            <Box width="75%">
+              <Grid container className={classes.root} spacing={spacing} justify="center" >
                 {albums.map((album, i) => (
-                  <Grid key={i} item xs={"auto"}>
+                  <Grid key={i} item>
                     {album}
                   </Grid>
                 ))}
