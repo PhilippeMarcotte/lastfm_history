@@ -8,7 +8,8 @@ def create_app():
     app.config.from_mapping(
         API_KEY = "4e96380beb079c7d09fc47e878e8ed39",
         API_SECRET = "f76b47d1543048e59293ec66217b8642",
-        DATABASE='api/db/history.db'
+        DATABASE='api/db/history.db',
+        LASTFM_ACCESS_POINT='http://ws.audioscrobbler.com/2.0/'
     )
 
     # ensure the instance folder exists

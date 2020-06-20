@@ -7,12 +7,7 @@ import json
 import multiprocessing
 import time
 
-def make_request(user, page):
-    api = current_app.config["API_KEY"]
-    url = f"http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={user}&api_key={api}&page={page}&limit=200&format=json"
-    return url
-
-def fetch_scrobbles_page(queue, scrobbles, user, values):
+def fetch_scrobbles_page(queue, scrobbles, params, values):
         while True:
             page = queue.get()
             if page == -1:
@@ -20,7 +15,18 @@ def fetch_scrobbles_page(queue, scrobbles, user, values):
             tries = 1
             while True:
                 try:
-                    r = requests.get(make_request(user, page))
+                    r = requests.get(current_app.config["LASTFM_ACCESS_POINT"], params=params)
+
+                    response = json.loads(r.text)
+
+                    values["total_pages"] = int(response["recenttracks"]["@attr"]["totalPages"])
+
+                    for track in response["recenttracks"]["track"]:
+                        scrobble = (track["date"]["uts"], track["name"], track["artist"]["#text"], track["album"]["#text"], track["image"][-1]["#text"])
+                        scrobbles.append(scrobble)
+                    if page >= values["total_pages"]:
+                        values["end"] = True
+                    values["page_count"] += 1
                     break  # success
                 except Exception as e:
                     if tries >= 3:
@@ -29,18 +35,7 @@ def fetch_scrobbles_page(queue, scrobbles, user, values):
                     time.sleep(1)
                     tries += 1
 
-            response = json.loads(r.text)
-
-            values["total_pages"] = int(response["recenttracks"]["@attr"]["totalPages"])
-
-            for track in response["recenttracks"]["track"]:
-                scrobble = (track["date"]["uts"], track["name"], track["artist"]["#text"], track["album"]["#text"], track["image"][-1]["#text"])
-                scrobbles.append(scrobble)
-            if page >= values["total_pages"]:
-                values["end"] = True
-            values["page_count"] += 1
-
-def fetch_scrobbles(user="Esiode"):
+def fetch_scrobbles(user="Esiode", from=0, n_workers=3):
     from .db import create_scrobbles
     from tqdm import tqdm
     manager = multiprocessing.Manager()
@@ -50,8 +45,13 @@ def fetch_scrobbles(user="Esiode"):
                            "total_pages": 0,
                            "end": 0})
     processes = []
-    for _ in range(3):
-        processes.append(multiprocessing.Process(target=fetch_scrobbles_page, args=(queue, scrobbles, user, values)))
+    params = {"user": user, 
+              "api_key": current_app.config["API_KEY"],
+              "from": from,
+              "format": "json",
+              "method": "user.getrecenttracks"}
+    for _ in range(n_workers):
+        processes.append(multiprocessing.Process(target=fetch_scrobbles_page, args=(queue, scrobbles, params, values)))
         processes[-1].start()
     
     queue.put(1)
