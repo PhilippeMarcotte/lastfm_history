@@ -15,7 +15,26 @@ def get_db():
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
+        db.commit()
         db.close()
+
+def create_scrobble(date, song, artist, album):
+    db = get_db()
+
+    sql = '''INSERT OR IGNORE INTO 
+           scrobbles(date, song, artist, album, url)
+           VALUES(?,?,?,?,?)'''
+    cur = db.cursor()
+    cur.execute(sql, (date, song, artist, album))
+
+def create_scrobbles(scrobbles):
+    db = get_db()
+
+    sql = '''INSERT OR IGNORE INTO 
+           scrobbles(date, song, artist, album, url)
+           VALUES(?,?,?,?,?)'''
+    cur = db.cursor()
+    cur.executemany(sql, scrobbles)
 
 def init_db():
     db = get_db()

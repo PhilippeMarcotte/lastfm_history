@@ -8,7 +8,7 @@ def create_app():
     app.config.from_mapping(
         API_KEY = "4e96380beb079c7d09fc47e878e8ed39",
         API_SECRET = "f76b47d1543048e59293ec66217b8642",
-        DATABASE='db/history.db'
+        DATABASE='api/db/history.db'
     )
 
     # ensure the instance folder exists
@@ -19,5 +19,8 @@ def create_app():
 
     from . import db
     db.init_app(app)
+
+    from . import lastfm
+    lastfm.init_app(app)
 
     return app
