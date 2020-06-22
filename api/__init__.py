@@ -9,7 +9,8 @@ def create_app():
         API_KEY = "4e96380beb079c7d09fc47e878e8ed39",
         API_SECRET = "f76b47d1543048e59293ec66217b8642",
         DATABASE='api/db/history.db',
-        LASTFM_ACCESS_POINT='http://ws.audioscrobbler.com/2.0/'
+        LASTFM_ROOT='http://ws.audioscrobbler.com/2.0/',
+        LISTENBRAINZ_ROOT="https://api.listenbrainz.org/1/user"
     )
 
     # ensure the instance folder exists
@@ -21,7 +22,10 @@ def create_app():
     from . import db
     db.init_app(app)
 
-    from . import lastfm
-    lastfm.init_app(app)
+    from . import builder
+    builder.init_app(app)
+
+    from . import api
+    app.register_blueprint(api.api, url_prefix="/api")
 
     return app
