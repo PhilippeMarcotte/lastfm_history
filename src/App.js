@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -30,6 +30,14 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const [spacing, setSpacing] = React.useState(2);
   const [n_albums, setNbrAlbums] = React.useState(50);
+  const [albumsJson, setAlbums] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/albums').then(res => res.json()).then(data => {
+      setAlbums(a => a.concat(data));
+    });
+  }, []);
+
   const classes = useStyles();
 
   const handleChange = (event, value) => {
@@ -45,7 +53,7 @@ function App() {
   {
     albums.push(<Album/>);
   }
-
+  console.log({albumsJson})
   return (
       <div>
         <Box margin="3vh 0.5vw 0vh 0.5vw">
@@ -85,9 +93,9 @@ function App() {
           <Box display="flex" style={{justifyContent: "center"}}>
             <Box width="75%">
               <Grid container className={classes.root} spacing={spacing} justify="center" >
-                {albums.map((album, i) => (
+                {albumsJson.map((album, i) => (
                   <Grid key={i} item>
-                    {album}
+                    <Album album={album} />
                   </Grid>
                 ))}
               </Grid>
