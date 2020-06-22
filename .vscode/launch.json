@@ -15,9 +15,56 @@
                 "FLASK_DEBUG": "0"
             },
             "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Flask: build-artists",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "api",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0"
+            },
+            "args": [
+                "build-albums",
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Flask: fetch-scrobbles",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "api",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0"
+            },
+            "args": [
                 "fetch-scrobbles",
             ],
             "jinja": true
-        }
+        },
+        {
+            "name": "Flask: get-albums",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "api",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0"
+            },
+            "args": [
+                "get-albums",
+            ],
+            "jinja": true
+        },
     ]
 }
