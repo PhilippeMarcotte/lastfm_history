@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Radio from '@material-ui/core/Radio';
-import Paper from '@material-ui/core/Paper';
 import Album from "./components/Album.js";
-import Slider from '@material-ui/core/Slider';
-import Typography from "@material-ui/core/Typography";
-import Box from "@material-ui/core/Box";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import { Button } from "@material-ui/core";
+import CssBaseline from '@material-ui/core/CssBaseline';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Box, Grid, Typography, Slider } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,6 +24,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
+
+  const theme = createMuiTheme({
+        palette: {
+          type: 'dark',
+        },
+        overrides: {
+          MuiSlider: {
+            thumb:{
+              color: "cyan"
+            },
+            track: {
+              color: 'cyan'
+            },
+            rail: {
+              color: 'black'
+            }
+          }
+        }
+      })
   const [spacing, setSpacing] = React.useState(2);
   const [n_albums, setNbrAlbums] = React.useState(50);
   const [albumsJson, setAlbums] = useState([]);
@@ -55,7 +70,9 @@ function App() {
   }
   console.log({albumsJson})
   return (
-      <div>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline/>
+      <Box>
         <Box margin="3vh 0.5vw 0vh 0.5vw">
           <Box>
             <Typography variant="body2" component="p">
@@ -102,7 +119,8 @@ function App() {
             </Box>
           </Box>
         </Box>
-      </div>
+      </Box>
+    </MuiThemeProvider>
   );
 }
 
