@@ -54,6 +54,17 @@ def create_artists(artists):
     cur = db.cursor()
     cur.executemany(sql, artists)
 
+def update_artists(artists):
+    db = get_db()
+    sql = '''
+          UPDATE artists 
+          SET date = ?
+          WHERE name = ?
+          '''
+
+    cur = db.cursor()
+    cur.executemany(sql, artists)
+
 def create_albums(albums):
     db = get_db()
     sql = '''INSERT OR IGNORE INTO 
@@ -63,11 +74,33 @@ def create_albums(albums):
     cur = db.cursor()
     cur.executemany(sql, albums)
 
+def update_albums(albums):
+    db = get_db()
+    sql = '''
+          UPDATE albums 
+          SET date = ?
+          WHERE name = ?
+          '''
+
+    cur = db.cursor()
+    cur.executemany(sql, albums)
+
 def create_songs(songs):
     db = get_db()
     sql = '''INSERT OR IGNORE INTO 
     songs(id, date, name, artist_id, album_id)
     VALUES(?,?,?,?,?)'''
+
+    cur = db.cursor()
+    cur.executemany(sql, songs)
+
+def update_songs(songs):
+    db = get_db()
+    sql = '''
+          UPDATE songs 
+          SET date = ?
+          WHERE name = ?
+          '''
 
     cur = db.cursor()
     cur.executemany(sql, songs)

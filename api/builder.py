@@ -1,4 +1,4 @@
-from .db import get_db, create_scrobbles, create_artists, create_albums, create_songs
+from .db import get_db, create_scrobbles, create_artists, create_albums, create_songs, update_artists, update_albums, update_songs
 from flask import current_app, g
 from flask.cli import with_appcontext
 import click
@@ -11,7 +11,6 @@ class Source(Enum):
     listenbrainz = 2
     all = 3
 
-@with_appcontext
 def fetch_scrobbles(user="Esiode", from_uts=0, source=Source.lastfm, limit=None, n_workers=3):
     scrobbles = []
     if source == Source.all or source == Source.lastfm:
@@ -26,7 +25,6 @@ def fetch_scrobbles(user="Esiode", from_uts=0, source=Source.lastfm, limit=None,
             scrobbles = scrobbles[:limit]
         create_scrobbles(scrobbles)
 
-@with_appcontext
 def update_scrobbles(user="Esiode", source=Source.lastfm):
     if source == Source.lastfm:
         source_str = "lastfm"
@@ -34,9 +32,17 @@ def update_scrobbles(user="Esiode", source=Source.lastfm):
     #     source_str = "listenbrainz"
 
     most_recent = get_db().cursor().execute(f"SELECT MAX(date) FROM scrobbles WHERE source LIKE {source_str}").fetchone()[0]
+    fetch_scrobbles(user, most_recent)
 
-@click.command()
-@with_appcontext
+def update_artists():
+    query = "SELECT artist, MAX(date) FROM scrobbles GROUP BY artist"
+    cur = get_db().cursor()
+    cur.execute(query)
+    artists = cur.fetchall()
+    artists.sort()
+    build_artists(artists)
+    update_artists(artists)
+
 def build_artists():
     query = "SELECT artist, MAX(date) FROM scrobbles GROUP BY artist"
     cur = get_db().cursor()
@@ -45,8 +51,15 @@ def build_artists():
     artists.sort()
     create_artists(artists)
 
-@click.command()
-@with_appcontext
+def update_albums():
+    query = "SELECT album, MAX(date) FROM scrobbles GROUP BY albums"
+    cur = get_db().cursor()
+    cur.execute(query)
+    albums = cur.fetchall()
+    albums.sort()
+    build_albums(albums)
+    update_albums(albums)
+
 def build_albums():
     query = "SELECT album, A.id, lastfm_art, spotify_art, MAX(S.date) FROM scrobbles S INNER JOIN artists A ON S.artist = A.name GROUP BY album"
     cur = get_db().cursor()
@@ -55,8 +68,15 @@ def build_albums():
     albums.sort(key=lambda album: album[0])
     create_albums(albums)
 
-@click.command()
-@with_appcontext
+def update_songs():
+    query = "SELECT album, MAX(date) FROM scrobbles GROUP BY songs"
+    cur = get_db().cursor()
+    cur.execute(query)
+    songs = cur.fetchall()
+    songs.sort()
+    build_songs(songs)
+    update_songs(songs)
+
 def build_songs():
     query = "SELECT MAX(date) as date, song, A.id, Ar.id from scrobbles Sc INNER JOIN artists A ON Sc.artist = A.name INNER JOIN albums Ar ON Sc.album = Ar.name GROUP BY song"
     cur = get_db().cursor()
@@ -64,6 +84,26 @@ def build_songs():
     songs = cur.fetchall()
     songs.sort(key=lambda album: album[0])
     create_songs(songs)
+
+@click.command("update-db")
+@click.option("--user", default="Esiode")
+@click.option("--source", type=click.Choice(['lastfm', 'listenbrainz', "all"], case_sensitive=False), default="lastfm", show_default=True)
+@with_appcontext
+def update_db_command(user, source):
+    update_scrobbles(user, Source[source])
+    update_artists()
+    update_albums()
+    update_songs()
+
+@click.command("build-db")
+@click.option("--user", default="Esiode")
+@click.option("--source", type=click.Choice(['lastfm', 'listenbrainz', "all"], case_sensitive=False), default="lastfm", show_default=True)
+@with_appcontext
+def build_db_command(user, source):
+    fetch_scrobbles(user, Source[source])
+    build_artists()
+    build_albums()
+    build_songs()
 
 @click.command("fetch-scrobbles")
 @click.option("--user", default="Esiode")
@@ -106,3 +146,4 @@ def init_app(app):
     app.cli.add_command(build_albums)
     app.cli.add_command(update_scrobbles_command)
     app.cli.add_command(update_all_scrobbles_command)
+    app.cli.add_command(build_db_command)
