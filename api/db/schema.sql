@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS songs;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS artists;
+DROP TABLE IF EXISTS scrobbles;
 
 CREATE TABLE IF NOT EXISTS scrobbles (
     date INTEGER PRIMARY KEY,
@@ -13,26 +14,26 @@ CREATE TABLE IF NOT EXISTS scrobbles (
 );
 
 CREATE TABLE IF NOT EXISTS songs (
-    date INTEGER PRIMARY KEY, 
+    date INTEGER, 
     name TEXT NOT NULL,
-    artist_id INTEGER NOT NULL,
-    album_id INTEGER NOT NULL,
-    FOREIGN KEY (artist_id) REFERENCES artist (id),
-    FOREIGN KEY (album_id) REFERENCES album (id)
+    artist TEXT NOT NULL,
+    album TEXT NOT NULL,
+    FOREIGN KEY (artist) REFERENCES artists (name),
+    FOREIGN KEY (album) REFERENCES albums (name),
+    PRIMARY KEY (name, artist, album)
 );
 
 CREATE TABLE IF NOT EXISTS albums (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    artist_id INTEGER NOT NULL,
+    artist INTEGER NOT NULL,
     lastfm_art TEXT,
     spotify_art TEXT,
     date INTEGER NOT NULL,
-    FOREIGN KEY (artist_id) REFERENCES artist (id)
+    FOREIGN KEY (artist) REFERENCES artists (name),
+    PRIMARY KEY (name, artist)
 );
 
 CREATE TABLE IF NOT EXISTS artists (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL PRIMARY KEY,
     date INTEGER NOT NULL
 );

@@ -38,28 +38,23 @@ def create_scrobbles(scrobbles):
 
 def create_scrobbles(scrobbles):
     db = get_db()
-    sql = '''INSERT OR IGNORE INTO 
-    scrobbles(date, song, artist, album, source, lastfm_art, spotify_art)
-    VALUES(?,?,?,?,?,?,?)'''
+    sql = '''
+          INSERT OR IGNORE INTO 
+          scrobbles(date, song, artist, album, source, lastfm_art, spotify_art)
+          VALUES(?,?,?,?,?,?,?)
+          '''
 
     cur = db.cursor()
     cur.executemany(sql, scrobbles)
 
 def create_artists(artists):
     db = get_db()
-    sql = '''INSERT OR IGNORE INTO 
-    artists(name, date)
-    VALUES(?,?)'''
-
-    cur = db.cursor()
-    cur.executemany(sql, artists)
-
-def update_artists(artists):
-    db = get_db()
     sql = '''
-          UPDATE artists 
-          SET date = ?
-          WHERE name = ?
+          INSERT INTO 
+          artists(name, date)
+          VALUES(?,?)
+          ON CONFLICT (name)
+          DO UPDATE SET date = excluded.date
           '''
 
     cur = db.cursor()
@@ -67,19 +62,12 @@ def update_artists(artists):
 
 def create_albums(albums):
     db = get_db()
-    sql = '''INSERT OR IGNORE INTO 
-    albums(name, artist_id, lastfm_art, spotify_art, date)
-    VALUES(?,?,?,?,?)'''
-
-    cur = db.cursor()
-    cur.executemany(sql, albums)
-
-def update_albums(albums):
-    db = get_db()
     sql = '''
-          UPDATE albums 
-          SET date = ?
-          WHERE name = ?
+          INSERT INTO
+          albums(name, artist, lastfm_art, spotify_art, date)
+          VALUES(?,?,?,?,?)
+          ON CONFLICT (name, artist)
+          DO UPDATE SET date = excluded.date
           '''
 
     cur = db.cursor()
@@ -87,19 +75,12 @@ def update_albums(albums):
 
 def create_songs(songs):
     db = get_db()
-    sql = '''INSERT OR IGNORE INTO 
-    songs(id, date, name, artist_id, album_id)
-    VALUES(?,?,?,?,?)'''
-
-    cur = db.cursor()
-    cur.executemany(sql, songs)
-
-def update_songs(songs):
-    db = get_db()
     sql = '''
-          UPDATE songs 
-          SET date = ?
-          WHERE name = ?
+          INSERT INTO 
+          songs(date, name, artist, album)
+          VALUES(?,?,?,?)
+          ON CONFLICT (name, artist, album)
+          DO UPDATE SET date = excluded.date
           '''
 
     cur = db.cursor()
