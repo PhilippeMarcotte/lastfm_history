@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Album from './Album.js';
 import { Box, Grid, Typography, Slider, List, ListItem } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
-import { useInfiniteScroll } from 'react-infinite-scroll-hook';
-import InfiniteScroll from "react-infinite-scroll-component";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,13 +63,6 @@ function AlbumGrid({ latestUpdate })
       console.log(albumsJson.length - (albumsJson.length % 5))
     });
   }
-
-  const infiniteRef = useInfiniteScroll({
-    loading,
-    hasNextPage: hasNextPage,
-    onLoadMore: handleLoadMore,
-    scrollContainer:"window",
-  });
 
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= 1.08 * e.target.clientHeight;

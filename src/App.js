@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AlbumGrid from "./components/AlbumGrid.js";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
-import { Button, makeStyles } from "@material-ui/core";
+import { Box, TextField, Select, InputLabel, MenuItem, FormControl, makeStyles } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
+  const [order, setOrder] = React.useState('');
 
   const [latestUpdate, setLatestUpdate] = useState(Date.now());
   function updateDB()
@@ -48,7 +49,11 @@ function App() {
             }
           }
         }
-      })
+      });
+  
+  const handleChange = (event) => {
+    setOrder(event.target.value);
+  };
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -63,6 +68,26 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
+      <Box display="flex" justifyContent="center" marginTop="0.5vh" marginBottom="0.5vh">
+        <FormControl>
+            <TextField label="Search"></TextField>
+        </FormControl>
+        <FormControl style={{"minWidth": "120px", marginLeft: "1vw"}}>
+          <InputLabel id="demo-simple-select-label">Order</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={order}
+            onChange={handleChange}
+          >
+            <MenuItem value={"Date"} selected={true}>Date</MenuItem>
+            <MenuItem value={"Album"}>Album</MenuItem>
+            <MenuItem value={"Artist"}>Artist</MenuItem>
+            <MenuItem value={"Song"}>Song</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
       <AlbumGrid latestUpdate={latestUpdate}/>
     </MuiThemeProvider>
   )
