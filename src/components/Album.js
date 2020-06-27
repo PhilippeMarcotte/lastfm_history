@@ -53,7 +53,7 @@ const OverflowTip = props => {
 function FormattedTime(props)
 {
   var date = new Date(props.time * 1000)
-  var formattedTime = date.getDay() + " " + monthNames[date.getMonth()] + ", " + date.getFullYear()
+  var formattedTime = date.getDate() + " " + monthNames[date.getMonth()] + ", " + date.getFullYear()
   return (<Typography variant="body2" color="textSecondary" component="p" style={{fontSize: "0.5vm"}}>
             {formattedTime}
           </Typography>)
