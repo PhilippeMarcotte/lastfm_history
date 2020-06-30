@@ -8,6 +8,10 @@ import IconButton from "@material-ui/core/IconButton";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Refresh from '@material-ui/icons/Refresh';
 import Typography from "@material-ui/core/Typography";
+import InputBase from '@material-ui/core/InputBase';
+import { fade } from '@material-ui/core/styles';
+import MenuIcon from '@material-ui/icons/Menu';
+import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,13 +21,54 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    flexGrow: 1,
+    marginRight: theme.spacing(50)
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: 'auto',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
   },
 }));
 
 function App() {
   const classes = useStyles();
-  const [order, setOrder] = React.useState('');
+
+  const [order, setOrder] = React.useState('Date');
 
   const [latestUpdate, setLatestUpdate] = useState(Date.now());
   function updateDB()
@@ -58,36 +103,40 @@ function App() {
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>
+      <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Albums
+          <IconButton
+            edge="start"
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="open drawer"
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap className={classes.title}>
+            Material-UI
           </Typography>
+          <div className={classes.search} style={{marginLeft: "16"}}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </div>
           <IconButton onClick={updateDB}>
             <Refresh />
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Box display="flex" justifyContent="center" marginTop="0.5vh" marginBottom="0.5vh">
-        <FormControl>
-            <TextField label="Search"></TextField>
-        </FormControl>
-        <FormControl style={{"minWidth": "120px", marginLeft: "1vw"}}>
-          <InputLabel id="demo-simple-select-label">Order</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={order}
-            onChange={handleChange}
-          >
-            <MenuItem value={"Date"} selected={true}>Date</MenuItem>
-            <MenuItem value={"Album"}>Album</MenuItem>
-            <MenuItem value={"Artist"}>Artist</MenuItem>
-            <MenuItem value={"Song"}>Song</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
+    </div>
+        
       <AlbumGrid latestUpdate={latestUpdate}/>
     </MuiThemeProvider>
   )
