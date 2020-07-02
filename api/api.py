@@ -15,14 +15,15 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-@api.route('/albums', defaults={"order":"date", "asc":False, "offset":0, "count":50})
-@api.route('/albums/order=<order>&asc=<asc>&offset=<offset>&count=<count>')
-def get_albums(order="date", asc=False, offset=0, count=50):
-  direction = "ASC" if asc else "DESC"
+@api.route('/albums/dateFrom=<dateFrom>&dateTo=<dateTo>&order=<order>&asc=<asc>&count=<count>&offset=<offset>')
+def get_albums(dateFrom, dateTo, order="date", asc="false", count=50, offset=0):
+  direction = "ASC" if asc.lower() == "true" else "DESC"
+  if int(dateTo) >= 0:
+    dateTo = f" AND date < {dateTo}"
   sql = f"""
           SELECT name, artist, date, lastfm_art, spotify_art 
           FROM albums
-          WHERE name != ''
+          WHERE name != '' AND date > {dateFrom}{dateTo}
           ORDER BY {order} {direction} 
           LIMIT {count} 
           OFFSET {offset}
@@ -33,7 +34,27 @@ def get_albums(order="date", asc=False, offset=0, count=50):
   results = cursor.execute(sql).fetchall()
   return json.dumps(results)
 
+@api.route('/albums/search/query=<query>&dateFrom=<dateFrom>&dateTo=<dateTo>&order=<order>&asc=<asc>&count=<count>&offset=<offset>')
+def search_albums(query, dateFrom, dateTo, order, asc, count, offset):
+  direction = "ASC" if asc.lower() == "true" else "DESC"
+  query = query.replace("*", "%")
+  if int(dateTo) >= 0:
+    dateTo = f" AND date < {dateTo}"
+  sql = f"""
+          SELECT name, artist, date, lastfm_art, spotify_art 
+          FROM albums
+          WHERE (name LIKE '{query}') OR (artist LIKE '{query}') AND date > {dateFrom}{dateTo}
+          ORDER BY {order} {direction} 
+          LIMIT {count} 
+          OFFSET {offset}
+          """
+  conn = get_db()
+  conn.row_factory = dict_factory
+  cursor = conn.cursor()
+  results = cursor.execute(sql).fetchall()
+  return json.dumps(results)
+  
 @api.route("/update")
 def update_db():
   builder.update_db()
-  return ''
+  return {"result": "done"}
