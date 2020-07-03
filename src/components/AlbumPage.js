@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, Typography, Slider, List, ListItem } from '@material-ui/core'
 import Bar from './Bar.js'
 
-function AlbumGrid() 
+function AlbumPage() 
 {
   const [albumsJson, setAlbums] = useState([]);
   const [api_query, setQuery] = useReducer(
@@ -130,4 +130,4 @@ function AlbumGrid()
   );
 }
 
-export default AlbumGrid;
+export default AlbumPage;
