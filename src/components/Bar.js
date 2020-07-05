@@ -1,5 +1,5 @@
 import 'date-fns';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Refresh from '@material-ui/icons/Refresh';
 import { fade } from '@material-ui/core/styles';
@@ -13,7 +13,7 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { FormControl, InputBase, MenuItem, InputLabel, Select, Grid, Button, Popover } from '@material-ui/core';
+import { InputBase, MenuItem, Select, Grid, Popover } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -58,8 +58,11 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
     width: '12ch',
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
+    '&:focus': {
+      width: '24ch',
+    },
+    [theme.breakpoints.down('sm')]: {
+      width: '8ch',
       '&:focus': {
         width: '20ch',
       },
@@ -99,7 +102,6 @@ function Bar(props)
   const sm = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const classes = useStyles();
   const [ascIcon, setAscIcon] = useState(<ArrowUpward/>);
-  const [sortClass, setSortClass] = useState(classes.sortUpward);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -244,15 +246,9 @@ function Bar(props)
 
   useEffect(() => {
     if (props.asc)
-    {
       setAscIcon(<ArrowUpward/>);
-      setSortClass(classes.sortUpward);
-    }
     else
-    {
       setAscIcon(<ArrowDownward/>);
-      setSortClass(classes.sortDownward);
-    }
   }, [props.asc]);
 
   return (

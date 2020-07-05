@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import Album from './Album.js';
-import { makeStyles } from '@material-ui/core/styles';
-import { Box, Grid, Typography, Slider, List, ListItem } from '@material-ui/core'
+import { Box, Grid } from '@material-ui/core'
 import Bar from './Bar.js'
 
 function AlbumPage() 
@@ -19,12 +18,8 @@ function AlbumPage()
     }
   );
 
-  const [loading, setLoading] = useState(false);
-  const [hasNextPage, setHasNextPage] = useState(true);
-
   function execute_query()
   {
-    setLoading(true);
     var prefix = "/api/albums/"
     if (api_query.query)
       prefix = "/api/albums/search/query=" + api_query.query + "&";
@@ -43,12 +38,11 @@ function AlbumPage()
         else
           setAlbums(data)
       }
-      setLoading(false);
     });
   }
   
   function refresh(){
-    fetch("/api/update").then(res => res.json()).then(data => {
+    fetch("/api/update").then(res => res.json()).then(() => {
       setQuery({offset: 0, query: ""});
     })
   }
