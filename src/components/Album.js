@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
-import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
+import {isMobile} from 'react-device-detect';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
 const useStyles = makeStyles((theme) => ({
   image: {
-    minWidth: "125px",
     width:"100%",
     maxWidth: "214px",
-    height: "auto"
+    height: "auto",
+    [theme.breakpoints.down('sm')]: {
+      width: "38vw"
+    }
   },
   text: {
     maxWidth:"214px",
@@ -27,15 +27,12 @@ const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
 
 const OverflowTip = props => {
   // Create Ref
-  const textElementRef = useRef();
+  const textElementRef = useRef(null);
 
   const compareSize = () => {
-    // if (textElementRef.current !== undefined)
-    // {
       const compare =
         textElementRef.current.scrollWidth > textElementRef.current.clientWidth;
       setHover(compare);
-    // }
   };
 
   // compare once and add resize listener on "componentDidMount"
@@ -51,17 +48,53 @@ const OverflowTip = props => {
 
   // Define state and function to update the value
   const [hoverStatus, setHover] = useState(false);
-  return (
-    <Tooltip
-      title={props.children.props.children}
-      interactive
-      disableHoverListener={!hoverStatus}
-      style={{fontSize: '2em'}}
-      ref={textElementRef}
-    >
-      {props.children}
-    </Tooltip>
-  );
+
+  const [open, setOpen] = React.useState(false);
+
+  const handleTooltipClose = () => {
+    setOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setOpen(!open);
+  };
+
+  if (isMobile && hoverStatus)
+  {
+    const children = props.children(textElementRef, handleTooltipOpen)
+    return (
+      <ClickAwayListener onClickAway={handleTooltipClose}>
+        <Tooltip
+          PopperProps={{
+            disablePortal: true,
+          }}
+          onClose={handleTooltipClose}
+          open={open}
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          title={props.title}
+          style={{fontSize: '2em'}}
+        >
+          {children}
+        </Tooltip>
+      </ClickAwayListener>
+    );
+  }
+  else
+  {
+    const children = props.children(textElementRef, null)
+    return (
+      <Tooltip
+        title={props.title}
+        interactive
+        disableHoverListener={!hoverStatus}
+        style={{fontSize: '2em'}}
+      >
+        {children}
+      </Tooltip>
+    );
+  }
 };
 
 function FormattedTime(props)
@@ -79,17 +112,21 @@ function Album(props)
 
   return (
     <Box>
-      <img  src={props.album.lastfm_art} className={classes.image} />
+      <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
       <Box>
-        <OverflowTip>
-          <Typography gutterBottom variant="h5" component="h2" style={{fontSize: "1vm"}} noWrap={true}>
-            {props.album.name}
-          </Typography>
+        <OverflowTip title={props.album.name}>
+          {(ref, onClick) =>
+            <Typography gutterBottom variant="h5" component="h2" style={{fontSize: "1vm"}} noWrap={true} ref={ref} onClick={onClick}>
+              {props.album.name}
+            </Typography>
+          }
         </OverflowTip>
-        <OverflowTip>
-          <Typography variant="body2" color="textSecondary" component="p" style={{fontSize: "0.5vm", marginTop:"-0.5rem"}} noWrap={true}>
-            {props.album.artist}
-          </Typography>
+        <OverflowTip title={props.album.artist}>
+          {(ref, onClick) =>
+            <Typography variant="body2" color="textSecondary" component="p" style={{fontSize: "0.5vm", marginTop:"-0.5rem"}} noWrap={true} ref={ref} onClick={onClick}>
+              {props.album.artist}
+            </Typography>
+          }
         </OverflowTip>
         <FormattedTime time={props.album.date}/>
       </Box>
