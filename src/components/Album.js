@@ -5,18 +5,20 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Box from "@material-ui/core/Box";
 import {isMobile} from 'react-device-detect';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import LazyLoad from 'react-lazy-load';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme) => ({
   image: {
     width:"100%",
-    maxWidth: "214px",
+    maxWidth: 214,
     height: "auto",
     [theme.breakpoints.down('sm')]: {
-      width: "38vw"
+      width: 158
     }
   },
   text: {
-    maxWidth:"214px",
+    maxWidth: 214,
   }
 }));
 
@@ -106,13 +108,15 @@ function FormattedTime(props)
           </Typography>)
 }
 
-function Album(props) 
+function Album(props)
 {
   const classes = useStyles();
-
+  const isDownSm = useMediaQuery(theme => theme.breakpoints.down('sm'));
   return (
     <Box>
-      <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
+      <LazyLoad height={isDownSm ? 158 : 214} offsetBottom={300} offsetTop={300}>
+        <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
+      </LazyLoad>
       <Box>
         <OverflowTip title={props.album.name}>
           {(ref, onClick) =>
