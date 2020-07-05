@@ -14,8 +14,8 @@ function AlbumPage()
       asc: false,
       offset: 0,
       query: "",
-      from: 0,
-      to: -1
+      from: new Date(0),
+      to: new Date()
     }
   );
 
@@ -28,9 +28,9 @@ function AlbumPage()
     var prefix = "/api/albums/"
     if (api_query.query)
       prefix = "/api/albums/search/query=" + api_query.query + "&";
-    
-    var query = prefix + "dateFrom=" + api_query.from 
-                       + "&dateTo="+ api_query.to 
+
+    var query = prefix + "dateFrom=" + Math.round(api_query.from.getTime() / 1000)
+                       + "&dateTo="+ Math.round(api_query.to.getTime() / 1000)
                        + "&order=" + api_query.order.replace("Album", "Name") 
                        + "&asc=" + api_query.asc 
                        + "&count=50" 
@@ -80,19 +80,17 @@ function AlbumPage()
 
   function onAscChange(event)
   {
-    setQuery({asc: !api_query.asc});
+    setQuery({asc: !api_query.asc, offset: 0});
   }
 
   function onFromChange(date)
   {
-    var date = new Date(date);
-    setQuery({from: Math.round(date.getTime() / 1000)});
+    setQuery({from: new Date(date)});
   }
 
   function onToChange(date)
   {
-    var date = new Date(date);
-    setQuery({to: Math.round(date.getTime() / 1000)});
+    setQuery({to: new Date(date)});
   }
 
   return(
@@ -110,13 +108,13 @@ function AlbumPage()
            onFromChange={onFromChange}
            to={api_query.to}
            onToChange={onToChange}/>
-      <Box onScroll={handleScroll} style={{"height": "100%", overflowY: "scroll", top: 0, bottom: 0}}>
-        <Box margin="3vh 0.5vw 0vh 0.5vw" style={{"height": "100%"}}>
-          <Box display="flex" style={{justifyContent: "center", "height": "100%"}}>
-            <Box width="75%" style={{"height": "100%"}}>
-                <Grid container style={{flexGrow: 0, "height": "100%"}} spacing={2} justify="center">
+      <Box onScroll={handleScroll} style={{"height": "100vh", overflowY: "scroll", top: 0, bottom: 0}}>
+        <Box margin="3vh 0.5vw 0vh 0.5vw">
+          <Box display="flex" style={{justifyContent: "center"}}>
+            <Box width="75%">
+                <Grid container style={{flexGrow: 0}} spacing={2} justify="center" alignItems="center" alignContent="center">
                   {albumsJson.slice(0, albumsJson.length > 6 ? albumsJson.length - (albumsJson.length % 6) - 6 : albumsJson.length).map((album, i) => (
-                      <Grid key={i} item>
+                      <Grid key={i} item xs={6} sm={2}>
                       <Album album={album} />
                       </Grid>
                   ))}
