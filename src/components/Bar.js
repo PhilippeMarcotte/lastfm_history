@@ -12,6 +12,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import ArrowUpward from '@material-ui/icons/ArrowUpward';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { FormControl, InputBase, MenuItem, InputLabel, Select, Grid, Button, Popover } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
@@ -27,10 +28,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
   },
   title: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
+    display: 'block',
   },
   search: {
     position: "relative",
@@ -41,10 +39,6 @@ const useStyles = makeStyles((theme) => ({
     },
     marginLeft: 0,
     width: "auto",
-    [theme.breakpoints.down('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: '10',
-    },
   },
   searchIcon: {
     padding: theme.spacing(0, 2),
@@ -63,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
-    width: 'auto',
+    width: '12ch',
     [theme.breakpoints.up('sm')]: {
       width: '12ch',
       '&:focus': {
@@ -73,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
   },
   select: {
     marginLeft: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      display: "none"
+    }
   },
   sortIcon: {
     height: 1,
@@ -99,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Bar(props)
 {
+  const sm = useMediaQuery(theme => theme.breakpoints.down('sm'));
   const classes = useStyles();
   const [ascIcon, setAscIcon] = useState(<ArrowUpward/>);
   const [sortClass, setSortClass] = useState(classes.sortUpward);
@@ -114,6 +112,135 @@ function Bar(props)
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  const orderSelect = (
+    <div>
+      <Select
+      value={props.orderValue}
+      onChange={props.onOrderChange}
+      className={classes.selectInput}
+      >
+      {props.orders.map((name, i) => (
+        <MenuItem value={name} key={i}>{name}</MenuItem>
+      ))}
+      </Select>
+      <IconButton onClick={props.onAscChange} className={classes.sortIcon}>
+        {ascIcon}
+      </IconButton>
+    </div>
+  );
+
+  var popover = (
+  <Popover 
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'right',
+    }}
+    id={id}
+    open={open}
+    anchorEl={anchorEl}
+    onClose={handleClose}
+  >
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <Typography className={classes.popoverTitle}>
+        Dates
+      </Typography>
+      <Grid container justify="center" spacing={2} alignItems="center" class={classes.dateGrid}>
+        <Grid item>
+          <KeyboardDatePicker
+          margin="normal"
+          label="De"
+          format="dd/MM/yyyy"
+          value={props.from}
+          onChange={props.onFromChange}
+          KeyboardButtonProps={{
+            'aria-label': 'change date',
+          }}
+          textFieldStyle={{width: 150}}
+          style={{width: 150}}
+          />
+        </Grid>
+        <Grid item>
+          <KeyboardDatePicker
+            margin="normal"
+            label="À"
+            format="dd/MM/yyyy"
+            value={props.to}
+            onChange={props.onToChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date',
+            }}
+            textFieldStyle={{width: 150}}
+            style={{width: 150}}
+          />
+        </Grid>
+      </Grid>
+    </MuiPickersUtilsProvider>
+  </Popover>);
+  if (sm)
+  {
+    popover = (            
+    <Popover 
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={id}
+      open={open}
+      anchorEl={anchorEl}
+      onClose={handleClose}
+    >
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <Typography className={classes.popoverTitle}>
+          Order
+        </Typography>
+        <div className={classes.popoverTitle}>
+          {orderSelect}
+        </div>
+        <Typography className={classes.popoverTitle}>
+          Dates
+        </Typography>
+        <Grid container justify="center" spacing={2} alignItems="center" class={classes.dateGrid}>
+          <Grid item>
+            <KeyboardDatePicker
+            margin="normal"
+            label="De"
+            format="dd/MM/yyyy"
+            value={props.from}
+            onChange={props.onFromChange}
+            KeyboardButtonProps={{
+              'aria-label': 'change date',
+            }}
+            textFieldStyle={{width: 150}}
+            style={{width: 150}}
+            />
+          </Grid>
+          <Grid item>
+            <KeyboardDatePicker
+              margin="normal"
+              label="À"
+              format="dd/MM/yyyy"
+              value={props.to}
+              onChange={props.onToChange}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+              textFieldStyle={{width: 150}}
+              style={{width: 150}}
+            />
+          </Grid>
+        </Grid>
+      </MuiPickersUtilsProvider>
+    </Popover>);
+  }
 
   useEffect(() => {
     if (props.asc)
@@ -143,8 +270,7 @@ function Bar(props)
             <Typography variant="h6" noWrap className={classes.title}>
               {props.title}
             </Typography>
-            {/* <div style={{flexGrow: 1, display: "flex", justifyContent: "center"}}> */}
-            <Grid container justify="center" spacing={2} alignItems="center">
+            <div style={{flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
               <div className={classes.search}>
                 <div className={classes.searchIcon}>
                   <SearchIcon />
@@ -161,74 +287,13 @@ function Bar(props)
                 />
               </div>
               <div className={classes.select}>
-                <Select
-                  value={props.orderValue}
-                  onChange={props.onOrderChange}
-                  className={classes.selectInput}
-                >
-                  {props.orders.map((name, i) => (
-                    <MenuItem value={name} key={i}>{name}</MenuItem>
-                  ))}
-                </Select>
-                <IconButton onClick={props.onAscChange} className={classes.sortIcon}>
-                  {ascIcon}
-                </IconButton>
+                {orderSelect}
               </div>
-              <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
+            </div>
+            <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
                 <FilterListIcon/>
-              </IconButton>
-              <Popover 
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'center',
-                }}
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-              >
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <Typography className={classes.popoverTitle}>
-                    Date filters
-                  </Typography>
-                  <Grid container justify="center" spacing={2} alignItems="center" class={classes.dateGrid}>
-                    <Grid item>
-                      <KeyboardDatePicker
-                      margin="normal"
-                      label="Date picker dialog"
-                      format="dd/MM/yyyy"
-                      value={props.from}
-                      onChange={props.onFromChange}
-                      KeyboardButtonProps={{
-                        'aria-label': 'change date',
-                      }}
-                      textFieldStyle={{width: 150}}
-                      style={{width: 150}}
-                      />
-                    </Grid>
-                    <Grid item>
-                      <KeyboardDatePicker
-                        margin="normal"
-                        label="Date picker dialog"
-                        format="dd/MM/yyyy"
-                        value={props.to}
-                        onChange={props.onToChange}
-                        KeyboardButtonProps={{
-                          'aria-label': 'change date',
-                        }}
-                        textFieldStyle={{width: 150}}
-                        style={{width: 150}}
-                      />
-                    </Grid>
-                  </Grid>
-                </MuiPickersUtilsProvider>
-              </Popover>
-              </Grid>
-            {/* </div> */}
+            </IconButton>
+            {popover}
             <IconButton onClick={props.refresh}>
               <Refresh />
             </IconButton>

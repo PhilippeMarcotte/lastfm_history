@@ -7,6 +7,20 @@ import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
+
+const useStyles = makeStyles((theme) => ({
+  image: {
+    minWidth: "125px",
+    width:"100%",
+    maxWidth: "214px",
+    height: "auto"
+  },
+  text: {
+    maxWidth:"214px",
+  }
+}));
+
+
 const monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
 ];
@@ -61,24 +75,19 @@ function FormattedTime(props)
 
 function Album(props) 
 {
-  const imageStyle = {
-    minWidth: "125px",
-    width:"100%",
-    maxWidth: "214px",
-    height: "auto"
-  };
+  const classes = useStyles();
 
   return (
     <Box>
-      <img  src={props.album.lastfm_art} style={imageStyle} />
+      <img  src={props.album.lastfm_art} className={classes.image} />
       <Box>
         <OverflowTip>
-          <Typography gutterBottom variant="h5" component="h2" style={{fontSize: "1vm", width:"214px"}} noWrap={true}>
+          <Typography gutterBottom variant="h5" component="h2" style={{fontSize: "1vm"}} noWrap={true}>
             {props.album.name}
           </Typography>
         </OverflowTip>
         <OverflowTip>
-          <Typography variant="body2" color="textSecondary" component="p" style={{fontSize: "0.5vm", marginTop:"-0.5rem", width:"214px"}} noWrap={true}>
+          <Typography variant="body2" color="textSecondary" component="p" style={{fontSize: "0.5vm", marginTop:"-0.5rem"}} noWrap={true}>
             {props.album.artist}
           </Typography>
         </OverflowTip>
