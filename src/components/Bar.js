@@ -19,10 +19,19 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import ViewListIcon from '@material-ui/icons/ViewList';
+import ViewModuleIcon from '@material-ui/icons/ViewModule';
+import useScrollTrigger from '@material-ui/core/useScrollTrigger';
+import Slide from '@material-ui/core/Slide';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+  },
+  popover:{
+    width: 400
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -86,16 +95,26 @@ const useStyles = makeStyles((theme) => ({
     minWidth: '8ch'
   },
   dateGrid: {
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
-    marginBottom: theme.spacing(2)
+    margin: theme.spacing(2),
   },
   popoverTitle: {
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
-    marginTop: theme.spacing(2)
+    margin: theme.spacing(2)
   }
 }));
+
+function HideOnScroll(props) {
+  const { children, target } = props;
+  // Note that you normally won't need to set the window ref as useScrollTrigger
+  // will default to window.
+  // This is only being set here because the demo is in an iframe.
+  const trigger = useScrollTrigger({target: target, threshold: 300});
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
 
 function Bar(props)
 {
@@ -132,6 +151,19 @@ function Bar(props)
     </div>
   );
 
+  const modeSelect = (
+    <div>
+      <ToggleButtonGroup value={props.mode} exclusive onChange={props.onModeChange}>
+        <ToggleButton value={props.modes[1]}>
+          <ViewListIcon />
+        </ToggleButton>
+        <ToggleButton value={props.modes[0]}>
+          <ViewModuleIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </div>
+  );
+
   var popover = (
   <Popover 
     anchorOrigin={{
@@ -148,10 +180,10 @@ function Bar(props)
     onClose={handleClose}
   >
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Typography className={classes.popoverTitle}>
-        Dates
-      </Typography>
-      <Grid container justify="center" spacing={2} alignItems="center" class={classes.dateGrid}>
+      <Grid container justify="center" spacing={1} alignItems="center" class={classes.dateGrid}>
+        <Typography>
+          Dates
+        </Typography>
         <Grid item>
           <KeyboardDatePicker
           margin="normal"
@@ -199,18 +231,13 @@ function Bar(props)
       open={open}
       anchorEl={anchorEl}
       onClose={handleClose}
+      className={classes.popover}
     >
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Typography className={classes.popoverTitle}>
-          Order
-        </Typography>
-        <div className={classes.popoverTitle}>
-          {orderSelect}
-        </div>
-        <Typography className={classes.popoverTitle}>
-          Dates
-        </Typography>
         <Grid container justify="center" spacing={2} alignItems="center" class={classes.dateGrid}>
+          <Typography>
+            Dates
+          </Typography>
           <Grid item>
             <KeyboardDatePicker
             margin="normal"
@@ -221,8 +248,8 @@ function Bar(props)
             KeyboardButtonProps={{
               'aria-label': 'change date',
             }}
-            textFieldStyle={{width: 150}}
-            style={{width: 150}}
+            textFieldStyle={{width: 200}}
+            style={{width: 200}}
             />
           </Grid>
           <Grid item>
@@ -235,12 +262,30 @@ function Bar(props)
               KeyboardButtonProps={{
                 'aria-label': 'change date',
               }}
-              textFieldStyle={{width: 150}}
-              style={{width: 150}}
+              textFieldStyle={{width: 200}}
+              style={{width: 200}}
             />
           </Grid>
         </Grid>
       </MuiPickersUtilsProvider>
+      <div style={{display: "flex"}}>
+      <Grid container spacing={4} class={classes.popoverTitle} style={{display: "inline-flex", justifyContent: "space-around", flexGrow: 1}} alignItems="center">
+        <Grid item style={{marginRight: 10}}>
+          <div>
+          <Typography>
+            Order
+          </Typography>
+          {orderSelect}
+          </div>
+        </Grid>
+        <Grid item>
+          <Typography>
+            Mode
+          </Typography>
+          {modeSelect}
+        </Grid>
+      </Grid>
+      </div>
     </Popover>);
   }
 
@@ -253,49 +298,55 @@ function Bar(props)
 
   return (
     <div className={classes.root}>
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton
-              edge="start"
-              className={classes.menuButton}
-              color="inherit"
-              aria-label="open drawer"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap className={classes.title}>
-              {props.title}
-            </Typography>
-            <div style={{flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
-              <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                  <SearchIcon />
-                </div>
-                <InputBase
-                  placeholder="Search…"
-                  classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput,
-                  }}
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={props.search}
-                  onChange={props.onSearchChange}
-                />
+      <HideOnScroll target={props.scrollTarget}>
+      <AppBar style={{ background: "#303030" }}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="open drawer"
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap className={classes.title}>
+            {props.title}
+          </Typography>
+          <div style={{flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
               </div>
-              <div className={classes.select}>
-                {orderSelect}
-              </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                value={props.search}
+                onChange={props.onSearchChange}
+              />
             </div>
-            <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
-                <FilterListIcon/>
-            </IconButton>
-            {popover}
-            <IconButton onClick={props.refresh}>
-              <Refresh />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-      </div>
+            <div className={classes.select}>
+              {orderSelect}
+            </div>
+            <div className={classes.select}>
+              {modeSelect}
+            </div>
+          </div>
+          <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
+              <FilterListIcon/>
+          </IconButton>
+          {popover}
+          <IconButton onClick={props.refresh}>
+            <Refresh />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      </HideOnScroll>
+      <Toolbar />
+    </div>
   );
 }
 

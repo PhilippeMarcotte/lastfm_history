@@ -29,15 +29,6 @@ def create_scrobble(date, song, artist, album):
 
 def create_scrobbles(scrobbles):
     db = get_db()
-    sql = '''INSERT OR IGNORE INTO 
-    scrobbles(date, song, artist, album, source, lastfm_art, spotify_art)
-    VALUES(?,?,?,?,?,?,?)'''
-
-    cur = db.cursor()
-    cur.executemany(sql, scrobbles)
-
-def create_scrobbles(scrobbles):
-    db = get_db()
     sql = '''
           INSERT OR IGNORE INTO 
           scrobbles(date, song, artist, album, source, lastfm_art, spotify_art)

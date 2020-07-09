@@ -58,6 +58,25 @@ def build_songs():
     songs.sort(key=lambda album: album[0])
     db.create_songs(songs)
 
+def update_spotify_art():
+    import spotipy
+    from spotipy.oauth2 import SpotifyClientCredentials
+    import tqdm
+
+    cur = db.get_db().cursor()
+    nbr_albums = cur.execute("SELECT COUNT(*) FROM ALBUMS WHERE (name != '' OR artist != '') AND spotify_art IS NULL").fetchone()[0]
+    query = "SELECT name, artist FROM albums WHERE (name != '' OR artist != '') AND spotify_art IS NULL"
+    cur.execute(query)
+
+    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
+    for album in tqdm.tqdm(cur, total=nbr_albums):
+      res = sp.search(f"album:{album[0]} artist:{album[1]}", type='album', limit=1)
+      if res["albums"]["total"] > 0:
+        images = res["albums"]["items"][0]['images']
+        spotify_art = images[1]["url"]
+        query = f"UPDATE albums SET spotify_art=? WHERE name = ? AND artist = ?"
+        db.get_db().cursor().execute(query, (spotify_art, album[0], album[1]))
+
 def build_db_from_scrobbles():
     build_artists()
     build_albums()
@@ -70,6 +89,11 @@ def build_db(user="Esiode", source=Source.lastfm):
 def update_db(user="Esiode", source=Source.lastfm):
     update_scrobbles(user, source)
     build_db_from_scrobbles()
+
+@click.command("update-spotify-art")
+@with_appcontext
+def update_spotify_art_command():
+  update_spotify_art()
 
 @click.command("update-db")
 @click.option("--user", default="Esiode")
@@ -126,3 +150,4 @@ def init_app(app):
     app.cli.add_command(update_all_scrobbles_command)
     app.cli.add_command(build_db_command)
     app.cli.add_command(update_db_command)
+    app.cli.add_command(update_spotify_art_command)

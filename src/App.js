@@ -1,5 +1,5 @@
 import React from 'react';
-import AlbumPage from "./components/AlbumPage.js";
+import AlbumPage from "./components/Albums/AlbumPage.js";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -8,19 +8,6 @@ function App() {
         palette: {
           type: 'dark',
         },
-        overrides: {
-          MuiSlider: {
-            thumb:{
-              color: "cyan"
-            },
-            track: {
-              color: 'cyan'
-            },
-            rail: {
-              color: 'black'
-            }
-          }
-        }
       });
 
   return (
