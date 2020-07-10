@@ -7,8 +7,8 @@ import {isMobile} from 'react-device-detect';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import LazyLoad from 'react-lazy-load';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { Link as RouterLink, Route, Switch } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
+import FullAlbum from "./FullAlbum.js";
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -21,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
   },
   text: {
     maxWidth: 214,
+  },
+  popover:
+  {
+    position: "absolute", height: "500px", width: "500px"
   }
 }));
 
@@ -112,16 +116,26 @@ function FormattedTime(props)
 
 function Album(props)
 {
+  const [open, setOpen] = useState(false);
+  function handleClick()
+  {
+    setOpen(true);
+  }
+  function handleClose(event)
+  {
+    setOpen(false);
+  }
   const classes = useStyles();
   const isDownSm = useMediaQuery(theme => theme.breakpoints.down('sm'));
-  const route = "/album/" + props.album.name + "/artist/" + props.album.artist;
+
   return (
     <Box>
-      <Button color="primary" component={RouterLink} to={route}>
+      <Button>
         <LazyLoad height={isDownSm ? 158 : 214} offsetBottom={300} offsetTop={300}>
-          <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
+          <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt="" onClick={handleClick}/>
         </LazyLoad>
       </Button>
+      <FullAlbum album={props.album} show={open} onClose={handleClose}/>
       <Box>
         <OverflowTip title={props.album.name}>
           {(ref, onClick) =>
