@@ -7,6 +7,8 @@ import {isMobile} from 'react-device-detect';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import LazyLoad from 'react-lazy-load';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { Link as RouterLink, Route, Switch } from 'react-router-dom';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   image: {
@@ -112,11 +114,14 @@ function Album(props)
 {
   const classes = useStyles();
   const isDownSm = useMediaQuery(theme => theme.breakpoints.down('sm'));
+  const route = "/album/" + props.album.name + "/artist/" + props.album.artist;
   return (
     <Box>
-      <LazyLoad height={isDownSm ? 158 : 214} offsetBottom={300} offsetTop={300}>
-        <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
-      </LazyLoad>
+      <Button color="primary" component={RouterLink} to={route}>
+        <LazyLoad height={isDownSm ? 158 : 214} offsetBottom={300} offsetTop={300}>
+          <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt=""/>
+        </LazyLoad>
+      </Button>
       <Box>
         <OverflowTip title={props.album.name}>
           {(ref, onClick) =>

@@ -41,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
   },
   search: {
     position: "relative",
+    [theme.breakpoints.up('md')]: {
+      position: "absolute",
+      left: "45%",
+    },
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.15),
     '&:hover': {
@@ -73,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down('sm')]: {
       width: '8ch',
       '&:focus': {
-        width: '20ch',
+        width: '20ch'
       },
     },
   },
@@ -107,7 +111,7 @@ function HideOnScroll(props) {
   // Note that you normally won't need to set the window ref as useScrollTrigger
   // will default to window.
   // This is only being set here because the demo is in an iframe.
-  const trigger = useScrollTrigger({target: target, threshold: 300});
+  const trigger = useScrollTrigger({target: target});
 
   return (
     <Slide appear={false} direction="down" in={!trigger}>
@@ -328,12 +332,12 @@ function Bar(props)
                 onChange={props.onSearchChange}
               />
             </div>
-            <div className={classes.select}>
+          </div>
+          <div className={classes.select}>
               {orderSelect}
-            </div>
-            <div className={classes.select}>
-              {modeSelect}
-            </div>
+          </div>
+          <div className={classes.select}>
+            {modeSelect}
           </div>
           <IconButton aria-describedby={id} variant="contained" onClick={handleClick}>
               <FilterListIcon/>
