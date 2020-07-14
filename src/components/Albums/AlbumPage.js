@@ -24,14 +24,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function ScrollTop(props) {
-  const { children, window } = props;
+  const { children, target } = props;
+  const [atTop, setAtTop] = useState(true);
   const classes = useStyles();
-  // Note that you normally won't need to set the window ref as useScrollTrigger
-  // will default to window.
-  // This is only being set here because the demo is in an iframe.
   const trigger = useScrollTrigger({
-    target: window,
-    disableHysteresis: true,
+    target: target,
+    disableHysteresis: false,
     threshold: 100,
   });
 
@@ -44,11 +42,11 @@ function ScrollTop(props) {
   };
 
   return (
-    <Zoom in={trigger}>
-      <div onClick={handleClick} role="presentation" className={classes.root}>
-        {children}
-      </div>
-    </Zoom>
+    <Slide appear={false} direction="up" in={!trigger} mountOnEnter unmountOnExit>
+        <div onClick={handleClick} role="presentation" className={classes.root}>
+          {children}
+        </div>
+    </Slide>
   );
 }
 
@@ -103,23 +101,8 @@ function AlbumPage(props)
     execute_query();
   }, [api_query])
 
-  // const handleScroll = (e) => {
-  //   if (loading)
-  //     return;
-  //   const windowHeight = "innerHeight" in window ? window.innerHeight : document.documentElement.offsetHeight;
-  //   const body = document.body;
-  //   const html = document.documentElement;
-  //   const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-  //   const windowBottom = windowHeight + window.pageYOffset;
-  //   const bottom = windowBottom >= docHeight;
-  //   console.log(bottom);
-  //   if (bottom) 
-  //     setQuery({offset: albumsJson.length})
-  // }
-
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= 1.08 * e.target.clientHeight;
-    console.log(bottom);
     if (bottom) 
       setQuery({offset: albumsJson.length})
   }
@@ -172,6 +155,7 @@ function AlbumPage(props)
 
   return(
     <div onScroll={handleScroll} style={{"height": "100vh", overflowY: "scroll", top: 0, bottom: 0}} ref={scrollable => { if (scrollable) setScrollTarget(scrollable); }}>
+      <div id="back-to-top-anchor"></div>
       <Bar title="Albums" 
           refresh={refresh} 
           search={api_query.query} 
@@ -191,13 +175,12 @@ function AlbumPage(props)
           scrollTarget={scrollTarget}
           />
       <Box my={2} /*style={{"height": "100vh", overflowY: "scroll", top: 0, bottom: 0}}*/>
-        <div id="back-to-top-anchor"></div>
         <Box margin="3vh 0.5vw 0vh 0.5vw">
           <Box display="flex" style={{justifyContent: "center"}}>
             <Box width="75%">
               {display()}
             </Box>
-            <ScrollTop window={scrollTarget}>
+            <ScrollTop target={scrollTarget}>
             <Fab>
               <NavigationIcon/>
             </Fab>
