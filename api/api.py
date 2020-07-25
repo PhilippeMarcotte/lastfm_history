@@ -15,6 +15,7 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+
 @api.route('/albums/dateFrom=<dateFrom>&dateTo=<dateTo>&order=<order>&asc=<asc>&count=<count>&offset=<offset>')
 def get_albums(dateFrom, dateTo, order="date", asc="false", count=50, offset=0):
   direction = "ASC" if asc.lower() == "true" else "DESC"
@@ -33,6 +34,7 @@ def get_albums(dateFrom, dateTo, order="date", asc="false", count=50, offset=0):
   cursor = conn.cursor()
   results = cursor.execute(sql).fetchall()
   return json.dumps(results)
+
 
 @api.route('/albums/search/query=<query>&dateFrom=<dateFrom>&dateTo=<dateTo>&order=<order>&asc=<asc>&count=<count>&offset=<offset>')
 def search_albums(query, dateFrom, dateTo, order, asc, count, offset):
@@ -54,7 +56,24 @@ def search_albums(query, dateFrom, dateTo, order, asc, count, offset):
   results = cursor.execute(sql).fetchall()
   return json.dumps(results)
   
+
 @api.route("/update")
 def update_db():
   builder.update_db()
   return {"result": "done"}
+
+
+@api.route("/songs/artist=<artist>&album=<album>")
+def get_songs_from(artist, album):
+  sql = f"""
+         SELECT date, name, artist, album, COUNT(*) as count
+         FROM songs
+         WHERE (artist='{artist}' AND album='{album}')
+         GROUP BY name, artist, album
+         ORDER BY date DESC
+         """
+  conn = get_db()
+  conn.row_factory = dict_factory
+  cursor = conn.cursor()
+  results = cursor.execute(sql).fetchall()
+  return json.dumps(results)
