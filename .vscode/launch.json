@@ -52,7 +52,7 @@
             "jinja": true
         },
         {
-            "name": "Flask: get-albums",
+            "name": "Flask: update-songs-order",
             "type": "python",
             "request": "launch",
             "module": "flask",
@@ -62,7 +62,7 @@
                 "FLASK_DEBUG": "0"
             },
             "args": [
-                "get-albums",
+                "update-songs-order",
             ],
             "jinja": true
         },
