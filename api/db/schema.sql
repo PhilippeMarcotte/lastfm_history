@@ -14,10 +14,11 @@ CREATE TABLE IF NOT EXISTS scrobbles (
 );
 
 CREATE TABLE IF NOT EXISTS songs (
-    date INTEGER, 
+    date INTEGER NOT NULL, 
     name TEXT NOT NULL,
     artist TEXT NOT NULL,
     album TEXT NOT NULL,
+    album_order INTEGER,
     FOREIGN KEY (artist) REFERENCES artists (name),
     FOREIGN KEY (album) REFERENCES albums (name),
     PRIMARY KEY (name, artist, album)
@@ -29,6 +30,7 @@ CREATE TABLE IF NOT EXISTS albums (
     lastfm_art TEXT,
     spotify_art TEXT,
     date INTEGER NOT NULL,
+    order_fetched INTEGER DEFAULT 0,
     FOREIGN KEY (artist) REFERENCES artists (name),
     PRIMARY KEY (name, artist)
 );

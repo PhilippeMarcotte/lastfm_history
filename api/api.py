@@ -66,11 +66,11 @@ def update_db():
 @api.route("/songs/artist=<artist>&album=<album>")
 def get_songs_from(artist, album):
   sql = f"""
-         SELECT date, name, artist, album, COUNT(*) as count
+         SELECT album_order, date, name, artist, album, (SELECT COUNT(*) FROM scrobbles as S WHERE S.song = name AND S.album = album AND S.artist = artist) as count
          FROM songs
          WHERE (artist='{artist}' AND album='{album}')
          GROUP BY name, artist, album
-         ORDER BY date DESC
+         ORDER BY album_order ASC
          """
   conn = get_db()
   conn.row_factory = dict_factory

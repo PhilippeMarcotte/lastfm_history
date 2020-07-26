@@ -63,7 +63,7 @@ function FullAlbum({ album, show, onClose })
     fetch("/api/songs/artist=" + album.artist + "&album=" + album.name).then(res => res.json()).then(data => {
       setSongs(data);
     })
-  }, [])
+  }, [album])
   function handleClose(event)
   {
     onClose(event);
@@ -85,6 +85,7 @@ function FullAlbum({ album, show, onClose })
       <Table size="small" aria-label="simple table">
         <TableHead>
           <StyledTableRow>
+          <StyledTableCell align="center">#</StyledTableCell>
             <StyledTableCell align="center">Song</StyledTableCell>
             <StyledTableCell align="center">Last Listen</StyledTableCell>
             <StyledTableCell align="center">Listen Count</StyledTableCell>
@@ -93,6 +94,9 @@ function FullAlbum({ album, show, onClose })
         <TableBody>
           {songs.map((song, i) => (
             <StyledTableRow key={i}>
+              <StyledTableCell align="center">
+                {song.album_order}
+              </StyledTableCell>
               <StyledTableCell align="center">
                 {song.name}
               </StyledTableCell>
