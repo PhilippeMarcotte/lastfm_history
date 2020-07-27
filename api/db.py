@@ -68,9 +68,9 @@ def create_songs(songs):
     db = get_db()
     sql = '''
           INSERT INTO 
-          songs(date, name, artist, album)
+          songs(date, name, album, artist)
           VALUES(?,?,?,?)
-          ON CONFLICT (name, artist, album)
+          ON CONFLICT (name, album, artist)
           DO UPDATE SET date = excluded.date
           '''
 

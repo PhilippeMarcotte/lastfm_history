@@ -29,24 +29,23 @@ function ScrollTop(props) {
   const classes = useStyles();
   const trigger = useScrollTrigger({
     target: target,
-    disableHysteresis: false,
+    disableHysteresis: true,
     threshold: 100,
   });
 
   const handleClick = (event) => {
     const anchor = (event.target.ownerDocument || document).querySelector('#back-to-top-anchor');
-    console.log(anchor);
     if (anchor) {
       anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
   return (
-    <Slide appear={false} direction="up" in={!trigger} mountOnEnter unmountOnExit>
+    <Zoom in={trigger}>
         <div onClick={handleClick} role="presentation" className={classes.root}>
           {children}
         </div>
-    </Slide>
+    </Zoom>
   );
 }
 
@@ -181,9 +180,9 @@ function AlbumPage(props)
               {display()}
             </Box>
             <ScrollTop target={scrollTarget}>
-            <Fab>
-              <NavigationIcon/>
-            </Fab>
+              <Fab>
+                <NavigationIcon/>
+              </Fab>
             </ScrollTop>
           </Box>
         </Box>

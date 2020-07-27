@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Paper, Typography, Button, Dialog, AppBar, Toolbar, IconButton, makeStyles } from '@material-ui/core';
+import { Box, Paper, Typography, Button, Dialog, AppBar, Toolbar, IconButton, makeStyles } from '@material-ui/core';
 import { Zoom, Slide } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import Table from '@material-ui/core/Table';
@@ -11,19 +11,18 @@ import TableRow from '@material-ui/core/TableRow';
 import { withStyles } from '@material-ui/core/styles';
 
 const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: "#212121",
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
+  root: {
+    "&last-child": {
+      borderBottom: "none"
+    }
   },
 }))(TableCell);
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: "#303030",
+      "&:last-child td": {
+        borderBottom: 0,
     },
   },
 }))(TableRow);
@@ -47,6 +46,12 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: theme.spacing(2),
     flex: 1,
   },
+  image: {
+    paddingTop: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    paddingBottom: theme.spacing(6),
+    paddingLeft: theme.spacing(50),
+  }
 }));
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -60,10 +65,11 @@ function FullAlbum({ album, show, onClose })
   const [songs, setSongs] = useState([]);
 
   useEffect(() => {
-    fetch("/api/songs/artist=" + album.artist + "&album=" + album.name).then(res => res.json()).then(data => {
-      setSongs(data);
-    })
-  }, [album])
+    if (!removed)
+      fetch("/api/songs/artist=" + album.artist + "&album=" + album.name).then(res => res.json()).then(data => {
+        setSongs(data);
+      })
+  }, [album, removed])
   function handleClose(event)
   {
     onClose(event);
@@ -80,37 +86,50 @@ function FullAlbum({ album, show, onClose })
           </IconButton>
         </Toolbar>
       </AppBar>
-      <img  src={album.spotify_art ? album.spotify_art : album.lastfm_art} alt="" style={{height: 300, width: 300}}/>
-      <TableContainer component={Paper}>
-      <Table size="small" aria-label="simple table">
-        <TableHead>
-          <StyledTableRow>
-          <StyledTableCell align="center">#</StyledTableCell>
-            <StyledTableCell align="center">Song</StyledTableCell>
-            <StyledTableCell align="center">Last Listen</StyledTableCell>
-            <StyledTableCell align="center">Listen Count</StyledTableCell>
-          </StyledTableRow>
-        </TableHead>
-        <TableBody>
-          {songs.map((song, i) => (
-            <StyledTableRow key={i}>
-              <StyledTableCell align="center">
-                {song.album_order}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {song.name}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {formatTime(song.date)}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                {song.count}
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <Box display="flex" justifyContent="center">
+        <Box style={{display: "flex", width: "65%", paddingTop: 3*8, paddingBottom: 3*8}}>
+          <img  src={album.spotify_art ? album.spotify_art : album.lastfm_art} alt="" style={{height: 300, width: 300}}/>
+          <div style={{paddingTop: 20}}>
+            <Typography>{album.name}</Typography>
+          </div>
+        </Box>
+      </Box>
+      <Box>
+        <Box display="flex" style={{justifyContent: "center"}}>
+          <Box width="75%">
+            <TableContainer component={Paper} elevation={false}>
+              <Table size="small" aria-label="simple table">
+                {/* <TableHead>
+                  <StyledTableRow>
+                  <StyledTableCell align="center">#</StyledTableCell>
+                    <StyledTableCell align="center">Song</StyledTableCell>
+                    <StyledTableCell align="center">Last Listen</StyledTableCell>
+                    <StyledTableCell align="center">Listen Count</StyledTableCell>
+                  </StyledTableRow>
+                </TableHead> */}
+                <TableBody>
+                  {songs.map((song, i) => (
+                    <StyledTableRow key={i}>
+                      <TableCell align="center">
+                        {song.album_order}
+                      </TableCell>
+                      <TableCell align="center">
+                        {song.name}
+                      </TableCell>
+                      <TableCell align="center">
+                        {formatTime(song.date)}
+                      </TableCell>
+                      <TableCell align="center">
+                        {song.count}
+                      </TableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Box>
+      </Box>
     </Dialog>
     );
   else

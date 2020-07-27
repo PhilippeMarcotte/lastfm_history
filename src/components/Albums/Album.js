@@ -130,7 +130,7 @@ function Album(props)
 
   return (
     <Box>
-      <Button>
+      <Button style={{margin: 0, padding: 0}} disableRipple>
         <LazyLoad height={isDownSm ? 158 : 214} offsetBottom={300} offsetTop={300}>
           <img  src={props.album.spotify_art ? props.album.spotify_art : props.album.lastfm_art} className={classes.image} alt="" onClick={handleClick}/>
         </LazyLoad>

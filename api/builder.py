@@ -24,6 +24,8 @@ def fetch_scrobbles(user="Esiode", from_uts=0, source=Source.lastfm, limit=None,
       if limit:
           scrobbles = scrobbles[:limit]
       db.create_scrobbles(scrobbles)
+      return scrobbles
+  return None
 
 @click.command("fetch-scrobbles")
 @click.option("--user", default="Esiode")
@@ -50,6 +52,7 @@ def update_scrobbles(user="Esiode", source=Source.lastfm):
 
   most_recent = db.get_db().cursor().execute(f"SELECT MAX(date) FROM scrobbles WHERE source LIKE '{source_str}'").fetchone()[0]
   fetch_scrobbles(user, most_recent)
+  return most_recent
 
 @click.command("update-scrobbles")
 @click.option("--user", default="Esiode")
@@ -68,43 +71,52 @@ def update_all_scrobbles_command(user):
   update_scrobbles(user, Source.all)
   click.echo('Updated scrobbles.')
 
-def build_artists():
-  query = "SELECT artist, MAX(date) FROM scrobbles GROUP BY artist"
+def build_artists(from_uts=""):
+  if from_uts:
+    from_uts = f"WHERE date > {from_uts} "
+  query = f"SELECT artist, MAX(date) as date FROM scrobbles {from_uts}GROUP BY artist"
   cur = db.get_db().cursor()
   cur.execute(query)
   artists = cur.fetchall()
   artists.sort()
   db.create_artists(artists)
 
-def build_albums():
-  query = "SELECT album, A.name, lastfm_art, spotify_art, MAX(S.date) FROM scrobbles S INNER JOIN artists A ON S.artist = A.name GROUP BY album"
+def build_albums(from_uts=""):
+  if from_uts:
+    from_uts = f"WHERE date > {from_uts} "
+  query = f"SELECT album, artist, lastfm_art, spotify_art, MAX(date) as date FROM scrobbles {from_uts}GROUP BY album, artist"
   cur = db.get_db().cursor()
   cur.execute(query)
   albums = cur.fetchall()
   albums.sort(key=lambda album: album[0])
   db.create_albums(albums)
+  return albums
 
 @click.command("build-albums")
 @with_appcontext
 def build_albums_command():
   build_albums()
 
-def build_songs():
-  query = "SELECT MAX(Sc.date) as date, song, A.name, Ar.name from scrobbles Sc INNER JOIN artists A ON Sc.artist = A.name INNER JOIN albums Ar ON Sc.album = Ar.name GROUP BY song"
+def build_songs(from_uts=""):
+  if from_uts:
+    from_uts = f"WHERE date > {from_uts} "
+  query = f"SELECT MAX(date) as date, song, album, artist FROM scrobbles {from_uts}GROUP BY song, album, artist"
   cur = db.get_db().cursor()
   cur.execute(query)
   songs = cur.fetchall()
   songs.sort(key=lambda album: album[0])
   db.create_songs(songs)
 
-def update_spotify_art():
+def update_spotify_art(from_uts=""):
   import spotipy
   from spotipy.oauth2 import SpotifyClientCredentials
   import tqdm
 
+  if from_uts:
+    from_uts = f"AND date > {from_uts}"
   cur = db.get_db().cursor()
-  nbr_albums = cur.execute("SELECT COUNT(*) FROM ALBUMS WHERE (name != '' AND artist != '') AND spotify_art IS NULL").fetchone()[0]
-  query = "SELECT name, artist FROM albums WHERE (name != '' AND artist != '') AND spotify_art IS NULL"
+  nbr_albums = cur.execute(f"SELECT COUNT(*) FROM ALBUMS WHERE (name != '' AND artist != '') AND spotify_art IS NULL {from_uts}").fetchone()[0]
+  query = f"SELECT name, artist FROM albums WHERE (name != '' AND artist != '') AND spotify_art IS NULL {from_uts}"
   cur.execute(query)
 
   sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
@@ -121,24 +133,27 @@ def update_spotify_art():
 def update_spotify_art_command():
   update_spotify_art()
 
-def update_songs_album_order():
+def update_songs_album_order(from_uts=""):
   cur = db.get_db().cursor()
-  query = "SELECT name, artist FROM albums WHERE name != '' AND artist != '' AND order_fetched = 0"
+  if from_uts:
+    from_uts = f"AND date > {from_uts}"
+  query = f"SELECT name, artist FROM albums WHERE name != '' AND artist != '' AND order_fetched = 0 {from_uts}"
   cur.execute(query)
+  albums = cur.fetchall()
 
-  lastfm.fetch_songs_album_order(db, cur.fetchall())
+  lastfm.fetch_songs_album_order(db, albums)
 
 @click.command("update-songs-order")
 @with_appcontext
 def update_songs_order_command():
   update_songs_album_order()
 
-def build_db_from_scrobbles():
-  build_artists()
-  build_albums()
-  build_songs()
-  update_spotify_art()
-  update_songs_album_order()
+def build_db_from_scrobbles(from_uts=""):
+  build_artists(from_uts)
+  build_songs(from_uts)
+  build_albums(from_uts)
+  update_spotify_art(from_uts)
+  update_songs_album_order(from_uts)
 
 def build_db(user="Esiode", source=Source.lastfm):
   fetch_scrobbles(user, source)
@@ -152,8 +167,8 @@ def build_db_command(user, source):
   build_db(user, Source[source])
 
 def update_db(user="Esiode", source=Source.lastfm):
-  update_scrobbles(user, source)
-  build_db_from_scrobbles()
+  most_recent = update_scrobbles(user, source)
+  build_db_from_scrobbles(most_recent)
 
 @click.command("update-db")
 @click.option("--user", default="Esiode")
