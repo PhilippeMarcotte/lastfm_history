@@ -4,7 +4,7 @@ from flask import Flask
 
 def create_app():
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, static_folder="../build", static_url_path='/')
     app.config.from_mapping(
         API_KEY = "4e96380beb079c7d09fc47e878e8ed39",
         API_SECRET = "f76b47d1543048e59293ec66217b8642",
@@ -12,6 +12,9 @@ def create_app():
         LASTFM_ROOT='http://ws.audioscrobbler.com/2.0/',
         LISTENBRAINZ_ROOT="https://api.listenbrainz.org/1/user"
     )
+    @app.route("/")
+    def index():
+        return app.send_static_file('index.html')
 
     # ensure the instance folder exists
     try:
