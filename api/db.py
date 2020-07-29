@@ -2,14 +2,18 @@ import sqlite3
 from flask import current_app, g
 from flask.cli import with_appcontext
 import click
+import os
 
 def get_db() -> sqlite3.Connection:
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
+      db_path = current_app.config['DATABASE']
+      if "DB_PATH" in os.environ:
+        db_path = os.get("DB_PATH")
+      db = g._database = sqlite3.connect(
+          db_path,
+          detect_types=sqlite3.PARSE_DECLTYPES
+      )
     return db
 
 def close_connection(exception):
