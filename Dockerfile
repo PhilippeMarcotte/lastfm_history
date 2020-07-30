@@ -12,7 +12,7 @@ RUN apt update -y &&\
     apt update -y &&\
     apt install -y nodejs yarn
 
-RUN yarn install && yarn build
+RUN yarn install --network-timeout 1000000 && yarn build
 
 RUN chmod +x /usr/src/app/lastfm_history/setup.sh
 
