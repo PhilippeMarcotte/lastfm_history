@@ -3,7 +3,7 @@ echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 TAG="${TRAVIS_TAG:-latest}"
 docker buildx build \
      --progress plain \
-    --platform=linux/amd64,linux/arm32 \
+    --platform=linux/amd64,linux/arm \
     -t ${DOCKER_USERNAME}/lastfm-history:$TAG \
     --push \
     .
