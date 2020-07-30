@@ -9,7 +9,7 @@ def get_db() -> sqlite3.Connection:
     if db is None:
       db_path = current_app.config['DATABASE']
       if "DB_PATH" in os.environ:
-        db_path = os.get("DB_PATH")
+        db_path = os.environ.get("DB_PATH")
       db = g._database = sqlite3.connect(
           db_path,
           detect_types=sqlite3.PARSE_DECLTYPES
