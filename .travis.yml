@@ -8,31 +8,18 @@ env:
 services:
 - docker
 
-jobs:
-  include:
-    # ARM, 32-bit, Little-endian
-    - name: "arm32 (armv8l)"
-      arch: arm64
-      env:
-        # https://packages.ubuntu.com/xenial/crossbuild-essential-armhf
-        - CC=arm-linux-gnueabihf-gcc
-        - SETARCH="setarch linux32 --verbose --32bit"
-      before_install:
-        - sudo dpkg --add-architecture armhf
-        - sudo apt-get update -yq
-        # There is no gcc-multilib on arm64.
-        # https://packages.ubuntu.com/xenial/gcc-multilib
-        # To run bin/hello, we need libc6:armhf deb package.
-        # Check `ldd bin/hello`.
-        # https://askubuntu.com/questions/133389
-        - |-
-          sudo apt-get -yq install \
-            crossbuild-essential-armhf \
-            libc6:armhf
-    - name: "amd64"
-      arch: amd64
+os:
+- linux
 
-script: docker build -t ${DOCKER_USERNAME}/lastfm-history:${TRAVIS_BRANCH} .
+before_install:
+  - curl -fsSL https://get.docker.com | sh
+  - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
+  - sudo service docker start
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+  - docker buildx create --name xbuilder --use
 
 deploy:
   provider: script
