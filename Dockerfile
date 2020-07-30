@@ -1,8 +1,5 @@
 FROM python:3.7.4
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
 WORKDIR /usr/src/app/lastfm_history
 COPY ./app ./
 
