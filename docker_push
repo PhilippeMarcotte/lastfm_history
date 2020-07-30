@@ -1,3 +1,9 @@
 #!/bin/bash
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker push "$DOCKER_USERNAME"/lastfm-history
+TAG="${TRAVIS_TAG:-latest}"
+docker buildx build \
+     --progress plain \
+    --platform=linux/amd64,linux/arm32 \
+    -t ${DOCKER_USERNAME}/lastfm-history:$TAG \
+    --push \
+    .
