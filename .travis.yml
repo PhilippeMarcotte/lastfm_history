@@ -6,7 +6,7 @@ env:
 jobs:
   include:
     - stage: build
-      language: nodejs
+      language: node_js
       node_js:
         - 14
       before_install:
