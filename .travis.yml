@@ -7,9 +7,11 @@ env:
   - secure: Ipz5ABqvezu8TOgexYbpPxuxR3sdaevbjbc5DJR03uW93K2YbYSW2lDPDyfhsJ62bu+b6FqNjDFF2fapvLU30BLaGK8yTuCzn5TYmC0VHolSqVgkClHtC26ZP3fvOh+RZxs8y6+r9a5y5i2EFSi0olaQUabBSA8+l09TSSslJEJ5nbVErDkBCbtBcJgJW4k043JP4BH/Gi6gP1kiWV3gNXFDkXq5/owYQmEmaq5GvxH1bTihkblYUG9DSsU6S0F8OOovvDhdFmrKgNRvfzwoIakTc0PcryQABFb0xzVQhbebptIbO0UyCvr3SQvv9cvimajjKLLiUQSXDFGe2aCtq1VF0bPgSVmq6CMNAIeEogSbhQwWr0pYOMEa4qIySJpakkYJ9psJsOxcRDJz32QEltj3htoDXaWHl9bsjl+ut96Ei9FO6IL5C32oBQ5YdZnuI83j6ubXd4M+BNYHjOwPOYjoqtLxERpSI0neGfd957YHml00K9SdTwDBId8tq9cZMI5VkefQVZB6F51K6qVK0zMEhD6EMW9Q1h//rMk8mduU84sVaHEqVoxKN81NA0pg5WVhdqUR8JFHB1d+ysW0CmNI4AtgHFnesy/tiAO8aVXJhwsEblqg1grzVTtT48Bz0kn1qeiX9C+PNMfX/+cX31QoT9F9L3gcTpu1p4UUYUU=
 services:
 - docker
-script:
-- docker build -t philmarc/lastfm-history .
-- docker tag philmarc/lastfm-history:$TRAVIS_BRANCH
+jobs:
+  include:
+    - stage: build
+      script: docker build -t ${DOCKER_USERNAME}/lastfm-history:${TRAVIS_BRANCH} .
+
 deploy:
   provider: script
   script: bash docker_push
