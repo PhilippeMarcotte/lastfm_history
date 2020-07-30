@@ -1,4 +1,3 @@
-warnings_are_errors: false
 env:
   global:
   - secure: qxCb/3A38lMTQUOkxVvkoBfuJSJgHStEupt5WC4rGVxzRqDYdAJVNppNFqR8BOemD22vXy0He0aZ0awAtAYZ4AbiRCknMekFzLauyBsNYDB48fJfaVnbRQQyFbCZdQJ2g6b0GBS+VRbMRLs25SjUwA8Y47TlX3wR3BpYNPR8IFHhAnJLClO1M7oCNBBtn6YK/tvVYMBJE1mlVXC4j8Yr18FBTvfiJF67yq8GttFeuYzvQopJzPbpP5eceH8HAU3zlirtB3iFRXOZMkPl8dWKf0BybV/DxXaw2DM5JdzjwM1XfiSeuFoTaKD+HdwanNPpKVS2d0kIBVMM7qrV3DaEbAIzX/dcIz1kNIQ2aE6EwpgpL29mXKinGpPT817qq5oJo4ixshDtOFWeGV6HBUq1prYs3mbcWFdBp2t3H4YyWCwt3TYlyWV9Bh1hvBzFp7qPYL734PEUbabUD89xCE7ZUzZhd3BfNFSR9t1sSKMbv5AKdNJEsnJy2zsz67RV/Vl9O+4vBeERXc3ykNkTcBnGyX24mDXsz/5Jm/zHES9UEUkTIoJOfqpMs4p6vnh1md4Rv0CYThUhAl0aF61TIen+epbxLJM3zB6jpvc2VQEdq4IoR0k+bHh5wUfb0OCmaLRVxlGr8e1yUG2OSwjyW03NSbh0dso7QJeHO/0wArecqdQ=
@@ -12,7 +11,7 @@ jobs:
         - 14
       before_install:
         - cd app/
-      script: yarn build
+      script: CI=false yarn build
     - stage: deploy
       services:
         - docker
