@@ -1,3 +1,4 @@
+#!/bin/bash
 export DB_PATH=/usr/data/history.db
 if [[ ! -f $DB_PATH ]]; then
   flask init-db
