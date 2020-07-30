@@ -13,8 +13,6 @@ jobs:
         - cd app/
       script: CI=false yarn build
     - stage: deploy
-      services:
-        - docker
       before_install:
         - curl -fsSL https://get.docker.com | sh
         - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
